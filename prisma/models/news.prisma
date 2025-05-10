@@ -1,0 +1,9 @@
+model News {
+    id Int @id @default(autoincrement())
+    slug String @unique
+    title String
+    details Json
+    date DateTime @default(now())
+    entityId Int
+    entity Entity @relation(fields: [entityId], references: [id])
+}

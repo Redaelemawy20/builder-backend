@@ -1,0 +1,60 @@
+model Entity {
+    id Int @id @default(autoincrement())
+    name String @unique
+    slug String @unique
+    meta Json 
+    pages Page[]
+    news  News[]
+    staff User[]
+    layoutItem Layout[]
+    cerdential Cerdential[]
+}
+model Page {
+    id Int @id @default(autoincrement())
+    name String 
+    slug String
+    entityId Int 
+    sections PageSections[] 
+    entity Entity @relation(fields: [entityId], references: [id])
+    @@unique([entityId, slug])
+}
+model Section{
+    id Int @id @default(autoincrement())
+    name String @unique
+    type  SectionType @default(section)
+    componentId String @unique
+    imgUrl String @default("") 
+    pages PageSections[] 
+    layouts Layout[]
+}
+model Layout {
+    id Int @id @default(autoincrement())
+    data Json 
+    type SectionType @default(nav)
+    sectionId Int?
+    order Int?
+    entityId Int
+    @@unique([sectionId, entityId])
+    entity Entity @relation(fields: [entityId], references: [id])
+    section Section? @relation(fields: [sectionId], references: [id])
+}
+
+
+model PageSections{
+    id Int @id @default(autoincrement()) 
+    pageId Int
+    sectionId Int
+    page Page @relation(fields: [pageId], references: [id], onDelete: Cascade)
+    section Section @relation(fields: [sectionId], references: [id])
+    data Json 
+    order Int ?
+   
+}
+
+enum SectionType{
+    nav
+    footer 
+    news
+    section
+    persons
+}
