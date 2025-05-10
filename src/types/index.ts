@@ -16,44 +16,32 @@ import {
 export type SectionType = 'nav' | 'footer' | 'news' | 'section' | 'persons';
 
 export interface AuthenticatedRequest extends Request {
-  credential?: Cerdential & {
-    user: User;
-    role: Role & {
-      permissions: (RolePermission & {
-        permission: Permission;
-      })[];
-    };
-  };
+  credential?: any;
   user?: User;
-  role?: Role;
+  role?: any;
+  file?: Express.Multer.File;
 }
 
 export interface UserWithRelations extends User {
   entity?: Entity;
-  credential?: Cerdential & {
-    role?: Role;
-  };
+  credential?: any;
 }
 
 export interface EntityWithRelations extends Entity {
   pages: Page[];
   news: News[];
   staff: User[];
-  layoutItem: Layout[];
+  layoutItem: any[];
 }
 
 export interface PageWithRelations extends Page {
   entity: Entity;
-  sections: (PageSections & {
-    section: Section;
-  })[];
+  sections: any[];
 }
 
 export interface SectionWithRelations extends Section {
-  pages: (PageSections & {
-    page: Page;
-  })[];
-  layouts: Layout[];
+  pages: any[];
+  layouts: any[];
 }
 
 export interface NewsWithRelations extends News {
