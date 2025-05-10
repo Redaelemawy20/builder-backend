@@ -23,7 +23,8 @@
     "db:setup": "prisma generate && prisma migrate deploy",
     "db:reset": "prisma migrate reset --force",
     "db:seed": "ts-node ./prisma/seeds/seed",
-    "db:dev": "prisma migrate dev"
+    "db:dev": "prisma migrate dev",
+    "node-use": "nvm use 18.18.0"
   },
   "prisma": {
     "schema": "./prisma"
