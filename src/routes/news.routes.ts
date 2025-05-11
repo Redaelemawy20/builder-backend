@@ -46,6 +46,69 @@ router.get(
   }
 );
 
+// Get news by entity slug
+router.get(
+  '/entity/:entitySlug',
+  auth,
+  async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    try {
+      const { entitySlug } = req.params;
+      const { take } = req.query;
+
+      const entity = await prisma.entity.findUnique({
+        where: { slug: entitySlug },
+      });
+
+      if (!entity) {
+        res.json([]);
+        return;
+      }
+
+      const news = await prisma.news.findMany({
+        where: { entityId: entity.id },
+        include: {
+          entity: true,
+        },
+        take: take ? parseInt(take as string) : undefined,
+        orderBy: {
+          id: 'desc',
+        },
+      });
+
+      res.json(news);
+    } catch (error) {
+      res.status(500).json({ message: 'Server error' });
+    }
+  }
+);
+
+// Get news by slug
+router.get(
+  '/slug/:slug',
+  auth,
+  async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    try {
+      const { slug } = req.params;
+
+      const news = await prisma.news.findFirst({
+        where: { slug },
+        include: {
+          entity: true,
+        },
+      });
+
+      if (!news) {
+        res.status(404).json({ message: 'News not found' });
+        return;
+      }
+
+      res.json(news);
+    } catch (error) {
+      res.status(500).json({ message: 'Server error' });
+    }
+  }
+);
+
 // Get news by ID
 router.get(
   '/:id',
@@ -78,9 +141,9 @@ router.post(
   upload.single('image'),
   [
     body('title').notEmpty(),
-    body('content').notEmpty(),
+    body('slug').notEmpty(),
     body('entityId').isInt(),
-    body('meta').isObject(),
+    body('details').isObject(),
   ],
   async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
@@ -90,13 +153,18 @@ router.post(
         return;
       }
 
-      const { title, content, entityId, meta } = req.body;
+      const { title, slug, entityId, details } = req.body;
       const imageUrl = req.file ? `/uploads/${req.file.filename}` : null;
 
       const news = await prisma.news.create({
         data: {
           title,
+          slug,
           entityId: parseInt(entityId),
+          details: {
+            ...details,
+            imageUrl,
+          },
         },
         include: {
           entity: true,
@@ -117,8 +185,8 @@ router.put(
   upload.single('image'),
   [
     body('title').optional(),
-    body('content').optional(),
-    body('meta').optional().isObject(),
+    body('slug').optional(),
+    body('details').optional().isObject(),
   ],
   async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
@@ -128,13 +196,18 @@ router.put(
         return;
       }
 
-      const { title, content, meta } = req.body;
+      const { title, slug, details } = req.body;
       const imageUrl = req.file ? `/uploads/${req.file.filename}` : undefined;
 
       const news = await prisma.news.update({
         where: { id: parseInt(req.params.id) },
         data: {
           title,
+          slug,
+          details: {
+            ...details,
+            ...(imageUrl && { imageUrl }),
+          },
         },
         include: {
           entity: true,

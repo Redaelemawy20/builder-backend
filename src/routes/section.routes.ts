@@ -12,11 +12,70 @@ router.get(
   auth,
   async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
+      const sections = await prisma.section.findMany();
+      res.json(sections);
+    } catch (error) {
+      res.status(500).json({ message: 'Server error' });
+    }
+  }
+);
+
+// Get news sections
+router.get(
+  '/news',
+  auth,
+  async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    try {
       const sections = await prisma.section.findMany({
-        include: {
-          pages: true,
-          layouts: true,
-        },
+        where: { type: 'news' },
+      });
+      res.json(sections);
+    } catch (error) {
+      res.status(500).json({ message: 'Server error' });
+    }
+  }
+);
+
+// Get staff sections
+router.get(
+  '/staff',
+  auth,
+  async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    try {
+      const sections = await prisma.section.findMany({
+        where: { type: 'persons' },
+      });
+      res.json(sections);
+    } catch (error) {
+      res.status(500).json({ message: 'Server error' });
+    }
+  }
+);
+
+// Get navigation sections
+router.get(
+  '/nav',
+  auth,
+  async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    try {
+      const sections = await prisma.section.findMany({
+        where: { type: 'nav' },
+      });
+      res.json(sections);
+    } catch (error) {
+      res.status(500).json({ message: 'Server error' });
+    }
+  }
+);
+
+// Get footer sections
+router.get(
+  '/footer',
+  auth,
+  async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    try {
+      const sections = await prisma.section.findMany({
+        where: { type: 'footer' },
       });
       res.json(sections);
     } catch (error) {
@@ -58,7 +117,7 @@ router.post(
   [
     body('name').notEmpty(),
     body('type').isIn(['nav', 'footer', 'news', 'section', 'persons']),
-    body('content').isObject(),
+    body('componentId').isInt(),
   ],
   async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
@@ -68,12 +127,13 @@ router.post(
         return;
       }
 
-      const { name, type, content } = req.body;
+      const { name, type, componentId } = req.body;
 
       const section = await prisma.section.create({
         data: {
           name,
           type,
+          componentId,
         },
         include: {
           pages: true,
@@ -97,7 +157,7 @@ router.put(
     body('type')
       .optional()
       .isIn(['nav', 'footer', 'news', 'section', 'persons']),
-    body('content').optional().isObject(),
+    body('componentId').optional().isInt(),
   ],
   async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
@@ -107,13 +167,14 @@ router.put(
         return;
       }
 
-      const { name, type, content } = req.body;
+      const { name, type, componentId } = req.body;
 
       const section = await prisma.section.update({
         where: { id: parseInt(req.params.id) },
         data: {
           name,
           type,
+          componentId,
         },
         include: {
           pages: true,

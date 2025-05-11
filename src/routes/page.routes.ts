@@ -51,16 +51,56 @@ router.get(
   }
 );
 
+// Get page sections by entity and page slugs
+router.get(
+  '/:entitySlug/:pageSlug/sections',
+  auth,
+  async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    try {
+      const { entitySlug, pageSlug } = req.params;
+
+      // Find the entity
+      const entity = await prisma.entity.findUnique({
+        where: { slug: entitySlug },
+      });
+
+      if (!entity) {
+        res.status(404).json({ message: 'Entity not found' });
+        return;
+      }
+
+      // Find the page
+      const page = await prisma.page.findFirst({
+        where: {
+          slug: pageSlug,
+          entityId: entity.id,
+        },
+        include: {
+          sections: {
+            include: {
+              section: true,
+            },
+          },
+        },
+      });
+
+      if (!page) {
+        res.status(404).json({ message: 'Page not found' });
+        return;
+      }
+
+      res.json(page.sections);
+    } catch (error) {
+      res.status(500).json({ message: 'Server error' });
+    }
+  }
+);
+
 // Create page
 router.post(
   '/',
   auth,
-  [
-    body('name').notEmpty(),
-    body('slug').notEmpty(),
-    body('entityId').isInt(),
-    body('meta').isObject(),
-  ],
+  [body('name').notEmpty(), body('slug').notEmpty(), body('entityId').isInt()],
   async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const errors = validationResult(req);
@@ -69,7 +109,7 @@ router.post(
         return;
       }
 
-      const { name, slug, entityId, meta } = req.body;
+      const { name, slug, entityId } = req.body;
 
       const page = await prisma.page.create({
         data: {
@@ -94,11 +134,7 @@ router.post(
 router.put(
   '/:id',
   auth,
-  [
-    body('name').optional(),
-    body('slug').optional(),
-    body('meta').optional().isObject(),
-  ],
+  [body('name').optional(), body('slug').optional()],
   async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const errors = validationResult(req);
@@ -107,7 +143,7 @@ router.put(
         return;
       }
 
-      const { name, slug, meta } = req.body;
+      const { name, slug } = req.body;
 
       const page = await prisma.page.update({
         where: { id: parseInt(req.params.id) },
@@ -148,7 +184,7 @@ router.delete(
 router.post(
   '/:id/sections',
   auth,
-  [body('sectionId').isInt()],
+  [body('sectionId').isInt(), body('data').isObject()],
   async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const errors = validationResult(req);
@@ -157,13 +193,15 @@ router.post(
         return;
       }
 
-      const { sectionId } = req.body;
+      const { sectionId, data, order } = req.body;
       const pageId = parseInt(req.params.id);
 
       const pageSection = await prisma.pageSections.create({
         data: {
           pageId,
           sectionId: parseInt(sectionId),
+          data,
+          order,
         },
       });
 
@@ -178,7 +216,7 @@ router.post(
 router.put(
   '/:pageId/sections/:sectionId',
   auth,
-  [body('order').optional().isInt()],
+  [body('data').optional().isObject(), body('order').optional().isInt()],
   async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
       const errors = validationResult(req);
@@ -187,15 +225,14 @@ router.put(
         return;
       }
 
-      const { order } = req.body;
-      const pageId = parseInt(req.params.pageId);
-      const sectionId = parseInt(req.params.sectionId);
+      const { data, order } = req.body;
 
       const pageSection = await prisma.pageSections.update({
         where: {
           id: parseInt(req.params.sectionId),
         },
         data: {
+          data,
           order,
         },
       });
@@ -213,9 +250,6 @@ router.delete(
   auth,
   async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
-      const pageId = parseInt(req.params.pageId);
-      const sectionId = parseInt(req.params.sectionId);
-
       await prisma.pageSections.delete({
         where: {
           id: parseInt(req.params.sectionId),
