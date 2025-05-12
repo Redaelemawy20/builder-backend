@@ -30,6 +30,8 @@
   },
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only index.ts",
+    "db:generate": "npx prisma generate dev",
+    "db:show": "npx prisma studio",
     "db:setup": "prisma generate && prisma migrate deploy",
     "db:reset": "prisma migrate reset --force",
     "db:seed": "ts-node ./prisma/seeds/seed",
