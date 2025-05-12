@@ -1,22 +1,26 @@
-model Entity {
+model Website {
     id Int @id @default(autoincrement())
     name String @unique
     slug String @unique
     meta Json 
     pages Page[]
     news  News[]
-    staff User[]
+    type String
+    isActive Boolean @default(true)
+    numberOfVisitors Int @default(0)
+    numberOfVisitorsPerMonth Int @default(0)
     layoutItem Layout[]
-    cerdential Cerdential[]
+    userId Int?
+    user User? @relation(fields: [userId], references: [id])
 }
 model Page {
     id Int @id @default(autoincrement())
     name String 
     slug String
-    entityId Int 
+    websiteId Int 
     sections PageSections[] 
-    entity Entity @relation(fields: [entityId], references: [id])
-    @@unique([entityId, slug])
+    website Website @relation(fields: [websiteId], references: [id])
+    @@unique([websiteId, slug])
 }
 model Section{
     id Int @id @default(autoincrement())
@@ -33,9 +37,9 @@ model Layout {
     type SectionType @default(nav)
     sectionId Int?
     order Int?
-    entityId Int
-    @@unique([sectionId, entityId])
-    entity Entity @relation(fields: [entityId], references: [id])
+    websiteId Int
+    @@unique([sectionId, websiteId])
+    website Website @relation(fields: [websiteId], references: [id])
     section Section? @relation(fields: [sectionId], references: [id])
 }
 

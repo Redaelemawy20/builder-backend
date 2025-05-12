@@ -4,6 +4,6 @@ model News {
     title String
     details Json
     date DateTime @default(now())
-    entityId Int
-    entity Entity @relation(fields: [entityId], references: [id])
+    websiteId Int
+    website Website @relation(fields: [websiteId], references: [id])
 }

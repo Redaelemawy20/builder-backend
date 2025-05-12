@@ -4,9 +4,8 @@ model User {
   slug String @unique
   data Json 
   leadership Boolean @default(false)
-  entityId Int?
-  entity Entity? @relation(fields: [entityId], references: [id])
   cerdential Cerdential?
+  websites Website[]
 }
 model Cerdential {
   id    Int     @id @default(autoincrement())
@@ -17,7 +16,6 @@ model Cerdential {
   userId Int? @unique
   user User? @relation(fields: [userId], references: [id])
   role Role? @relation(fields: [roleId], references: [id])
-  entity Entity? @relation(fields: [entityId], references: [id])
 }
 model Role {
   id Int @id @default(autoincrement())
