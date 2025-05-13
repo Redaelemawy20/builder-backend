@@ -6,7 +6,7 @@ model Website {
     pages Page[]
     news  News[]
     type String
-    isActive Boolean @default(true)
+    status WebsiteStatus @default(INACTIVE)
     numberOfVisitors Int @default(0)
     numberOfVisitorsPerMonth Int @default(0)
     layoutItem Layout[]
@@ -61,4 +61,9 @@ enum SectionType{
     news
     section
     persons
+}
+
+enum WebsiteStatus{
+    ACTIVE
+    INACTIVE
 }
