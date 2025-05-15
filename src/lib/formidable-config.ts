@@ -2,6 +2,7 @@ import formidable from 'formidable';
 
 function createFormidableParser(options: formidable.Options = {}) {
   const form = formidable({
+    keepExtensions: true,
     ...options,
   });
 
