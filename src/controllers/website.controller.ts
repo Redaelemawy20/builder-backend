@@ -1,4 +1,4 @@
-import { WebsiteStatus } from '@prisma/client';
+import { WebsiteStatus, WebsiteType } from '@prisma/client';
 import prisma from '../lib/prisma';
 import { Request, Response, NextFunction } from 'express';
 import { Tr } from '../types';
@@ -26,7 +26,7 @@ export const getWebsites = async (req: any, res: any) => {
 interface CreateWebsiteBody {
   name: string;
   status: WebsiteStatus;
-  type: string;
+  type: WebsiteType;
   topTitle: Tr<string>;
   description: Tr<string>;
   logo: {

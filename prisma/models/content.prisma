@@ -5,7 +5,7 @@ model Website {
     meta Json 
     pages Page[]
     news  News[]
-    type String
+    type WebsiteType @default(Other)
     status WebsiteStatus @default(INACTIVE)
     numberOfVisitors Int @default(0)
     numberOfVisitorsPerMonth Int @default(0)
@@ -66,4 +66,17 @@ enum SectionType{
 enum WebsiteStatus{
     ACTIVE
     INACTIVE
+}
+
+enum WebsiteType{
+    Website
+    Ecommerce
+    Blog
+    Portfolio
+    News
+    Travel
+    Education
+    Community
+    Application
+    Other
 }
