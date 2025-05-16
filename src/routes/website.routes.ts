@@ -5,4 +5,7 @@ const router = Router();
 
 router.get('/', (req, res) => WebsiteController.getWebsites(req, res));
 router.post('/', auth, (req, res) => WebsiteController.createWebsite(req, res));
+router.get('/user', auth, (req, res) =>
+  WebsiteController.getUserWebsites(req, res)
+);
 export default router;

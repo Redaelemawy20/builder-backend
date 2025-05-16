@@ -90,3 +90,17 @@ export const createWebsite = async (req: Request, res: Response) => {
     }
   );
 };
+
+// get user websites
+export const getUserWebsites = async (req: Request, res: Response) => {
+  if (!req.user) {
+    res.status(401).json({ message: 'Unauthorized' });
+    return;
+  }
+  const websites = await prisma.website.findMany({
+    where: {
+      userId: req.user.id,
+    },
+  });
+  res.json(websites);
+};
