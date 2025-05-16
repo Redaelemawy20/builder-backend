@@ -67,7 +67,7 @@ export const createWebsite = async (req: Request, res: Response) => {
               topTitle: bodyData.topTitle,
               description: bodyData.description,
               logoImage: logoImage
-                ? path.join('uploads', logoImage.newFilename)
+                ? { _s: path.join('uploads', logoImage.newFilename) }
                 : null,
             },
             userId: req.user.id,

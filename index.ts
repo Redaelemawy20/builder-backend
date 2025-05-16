@@ -28,6 +28,8 @@ app.use('/api/pages', pageRoutes);
 app.use('/api/sections', sectionRoutes);
 app.use('/api/news', newsRoutes);
 
+app.use('/api/uploads', express.static('uploads'));
+
 // Error handling middleware
 app.use(
   (
