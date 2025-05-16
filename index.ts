@@ -9,6 +9,7 @@ import websiteRoutes from './src/routes/website.routes';
 import pageRoutes from './src/routes/page.routes';
 import sectionRoutes from './src/routes/section.routes';
 import newsRoutes from './src/routes/news.routes';
+import lang from './src/middleware/lang.middleware';
 
 dotenv.config();
 
@@ -18,7 +19,7 @@ const app: Express = express();
 app.use(cors());
 app.use(express.json());
 app.use(morgan('dev'));
-
+app.use(lang);
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
